@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>トミカ コレクション トラッカー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root,[data-theme="light"]{
+  --bg:#f2f1ed;--surf:#fafaf7;--surf2:#fff;--surfo:#e8e6e0;
+  --div:#dddbd5;--bdr:#d0cdc7;
+  --tx:#1a1814;--txm:#6b6965;--txf:#aaa9a5;--txi:#fff;
+  --red:#c41e1e;--redh:#a31515;--redhi:#fce8e8;
+  --gold:#b87a00;--goldbg:#fdf6e3;--goldbdr:#e8c966;
+  --blue:#1a5fa8;--bluebg:#e8f0fb;--bluebdr:#6fa3dc;
+  --grn:#2a7a2a;--grnbg:#e8f5e8;
+  --sh1:0 1px 3px rgba(0,0,0,.07);--sh2:0 4px 16px rgba(0,0,0,.10);--sh3:0 12px 36px rgba(0,0,0,.13);
+  --r1:.375rem;--r2:.5rem;--r3:.75rem;--r4:1.125rem;--rf:9999px;
+  --fd:'Oswald',sans-serif;--fb:'Noto Sans JP',sans-serif;
+  --xs:clamp(.7rem,.65rem+.2vw,.8rem);--sm:clamp(.8rem,.75rem+.3vw,.9rem);
+  --base:clamp(.9rem,.85rem+.25vw,1rem);--lg:clamp(1.1rem,.95rem+.7vw,1.4rem);--xl:clamp(1.4rem,1.1rem+1.2vw,2rem);
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;
+  --tr:180ms cubic-bezier(.16,1,.3,1);
+}
+[data-theme="dark"]{
+  --bg:#111009;--surf:#1a1916;--surf2:#222018;--surfo:#181715;
+  --div:#2a2824;--bdr:#363330;
+  --tx:#d5d2cc;--txm:#7a7773;--txf:#4e4c48;--txi:#fff;
+  --red:#e03535;--redh:#f05050;--redhi:#3a1a1a;
+  --gold:#d4a020;--goldbg:#2a2210;--goldbdr:#6a5010;
+  --blue:#5090d8;--bluebg:#121e2e;--bluebdr:#1e3a5a;
+  --grn:#4caf50;--grnbg:#0f2210;
+  --sh1:0 1px 3px rgba(0,0,0,.3);--sh2:0 4px 16px rgba(0,0,0,.4);--sh3:0 12px 36px rgba(0,0,0,.5);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){
+  --bg:#111009;--surf:#1a1916;--surf2:#222018;--surfo:#181715;--div:#2a2824;--bdr:#363330;
+  --tx:#d5d2cc;--txm:#7a7773;--txf:#4e4c48;--txi:#fff;--red:#e03535;--redh:#f05050;--redhi:#3a1a1a;
+  --gold:#d4a020;--goldbg:#2a2210;--goldbdr:#6a5010;--blue:#5090d8;--bluebg:#121e2e;--bluebdr:#1e3a5a;
+  --grn:#4caf50;--grnbg:#0f2210;
+  --sh1:0 1px 3px rgba(0,0,0,.3);--sh2:0 4px 16px rgba(0,0,0,.4);--sh3:0 12px 36px rgba(0,0,0,.5);
+}}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--fb);font-size:var(--base);color:var(--tx);background:var(--bg);transition:background var(--tr),color var(--tr)}
+img,svg{display:block;max-width:100%}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* ══ AUTH SCREEN ══ */
+#auth-screen{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);padding:var(--s4);
+}
+.auth-box{
+  background:var(--surf2);border-radius:var(--r4);
+  box-shadow:var(--sh3);width:100%;max-width:400px;overflow:hidden;
+}
+.auth-header{
+  background:var(--red);padding:var(--s6);
+  display:flex;flex-direction:column;align-items:center;gap:var(--s3);color:#fff;
+}
+.auth-logo{display:flex;align-items:center;gap:var(--s3)}
+.auth-title{font-family:var(--fd);font-size:var(--xl);font-weight:700;letter-spacing:.06em}
+.auth-sub{font-size:var(--xs);opacity:.8;letter-spacing:.08em}
+.auth-tabs{display:flex;border-bottom:1px solid var(--div)}
+.atab{flex:1;padding:var(--s3) var(--s4);font-size:var(--sm);font-weight:600;color:var(--txm);border-bottom:2.5px solid transparent;transition:all var(--tr);text-align:center}
+.atab.on{color:var(--red);border-bottom-color:var(--red)}
+.auth-body{padding:var(--s6)}
+.auth-form{display:flex;flex-direction:column;gap:var(--s4)}
+.auth-form.hidden{display:none}
+.f-lbl{font-size:var(--xs);color:var(--txm);margin-bottom:var(--s1);display:block}
+.f-inp{
+  width:100%;padding:var(--s3) var(--s4);
+  border:1.5px solid var(--bdr);border-radius:var(--r2);
+  background:var(--surf);font-size:var(--sm);
+  transition:border-color var(--tr),box-shadow var(--tr);
+}
+.f-inp:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--redhi)}
+.f-group{display:flex;flex-direction:column;gap:var(--s1)}
+.btn-primary{
+  width:100%;padding:var(--s3) var(--s4);border-radius:var(--r2);
+  font-size:var(--sm);font-weight:700;background:var(--red);color:#fff;border:none;
+  transition:background var(--tr),transform var(--tr);
+}
+.btn-primary:hover{background:var(--redh)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.auth-err{
+  font-size:var(--xs);color:var(--red);
+  background:var(--redhi);padding:var(--s2) var(--s3);
+  border-radius:var(--r1);display:none;
+}
+.auth-err.show{display:block}
+.auth-ok{
+  font-size:var(--xs);color:var(--grn);
+  background:var(--grnbg);padding:var(--s2) var(--s3);
+  border-radius:var(--r1);display:none;
+}
+.auth-ok.show{display:block}
+.auth-loading{text-align:center;color:var(--txm);font-size:var(--sm);padding:var(--s8)}
+.spinner{
+  width:32px;height:32px;border:3px solid var(--div);border-top-color:var(--red);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto var(--s3);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ APP (hidden until logged in) ══ */
+#app{display:none}
+#app.visible{display:block}
+
+/* ══ HEADER ══ */
+.hdr{position:sticky;top:0;z-index:100;background:var(--red);box-shadow:0 2px 16px rgba(0,0,0,.28)}
+.hdr-i{max-width:1340px;margin:0 auto;padding:0 var(--s6);display:flex;align-items:center;gap:var(--s4);height:58px}
+.logo{display:flex;align-items:center;gap:var(--s3);color:#fff;flex-shrink:0}
+.logo-svg{width:34px;height:34px}
+.logo-text{font-family:var(--fd);font-size:1.25rem;font-weight:700;letter-spacing:.06em;line-height:1}
+.logo-sub{font-size:var(--xs);opacity:.75;letter-spacing:.08em}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:var(--s3)}
+.user-chip{
+  display:flex;align-items:center;gap:var(--s2);
+  background:rgba(255,255,255,.15);border-radius:var(--rf);
+  padding:var(--s1) var(--s3);font-size:var(--xs);color:#fff;
+  max-width:160px;
+}
+.user-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.icon-btn{
+  width:34px;height:34px;border-radius:var(--rf);
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.15);color:#fff;
+  transition:background var(--tr);flex-shrink:0;
+}
+.icon-btn:hover{background:rgba(255,255,255,.28)}
+
+/* ══ STATS ══ */
+.stats{background:var(--surf);border-bottom:1px solid var(--div);padding:var(--s4) var(--s6)}
+.stats-i{max-width:1340px;margin:0 auto;display:flex;flex-wrap:wrap;gap:var(--s4) var(--s8);align-items:center}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat-lbl{font-size:var(--xs);color:var(--txm);text-transform:uppercase;letter-spacing:.07em}
+.stat-val{font-family:var(--fd);font-size:var(--lg);font-weight:600;line-height:1.1}
+.vr{color:var(--red)}.vg{color:var(--gold)}.vb{color:var(--blue)}
+.prog-wrap{flex:1;min-width:200px}
+.prog-bar{height:9px;border-radius:var(--rf);background:var(--surfo);overflow:hidden;margin-bottom:var(--s1)}
+.prog-fill{height:100%;border-radius:var(--rf);background:linear-gradient(90deg,var(--red),var(--gold));transition:width .7s cubic-bezier(.16,1,.3,1)}
+.prog-lbl{font-size:var(--xs);color:var(--txm);text-align:right}
+
+/* ══ SYNC STATUS ══ */
+.sync-bar{
+  background:var(--surf);border-bottom:1px solid var(--div);
+  padding:var(--s1) var(--s6);display:flex;align-items:center;gap:var(--s2);
+  font-size:var(--xs);color:var(--txm);min-height:28px;
+}
+.sync-bar.hidden{display:none}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--txf);flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:pulse 1s ease-in-out infinite}
+.sync-dot.saved{background:var(--grn)}
+.sync-dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ══ CONTROLS ══ */
+.ctrl{background:var(--surf);border-bottom:1px solid var(--div);padding:var(--s3) var(--s6);position:sticky;top:58px;z-index:90}
+.ctrl-i{max-width:1340px;margin:0 auto;display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center}
+.srch-wrap{position:relative;flex:1;min-width:180px;max-width:340px}
+.srch-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txm);pointer-events:none}
+.srch{width:100%;padding:var(--s2) var(--s3) var(--s2) 34px;border:1.5px solid var(--bdr);border-radius:var(--r2);background:var(--surf2);font-size:var(--sm);transition:border-color var(--tr),box-shadow var(--tr)}
+.srch:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--redhi)}
+.fbtns{display:flex;gap:var(--s2);flex-wrap:wrap}
+.fb{padding:var(--s1) var(--s3);border-radius:var(--rf);font-size:var(--xs);font-weight:500;border:1.5px solid var(--bdr);background:var(--surf2);color:var(--txm);transition:all var(--tr)}
+.fb:hover{border-color:var(--red);color:var(--red)}
+.fb.on{border-color:var(--red);background:var(--red);color:#fff}
+.fb.gold.on{border-color:var(--gold);background:var(--gold);color:#fff}
+.fb.blue.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.sel{padding:var(--s1) var(--s3);border-radius:var(--r2);font-size:var(--xs);border:1.5px solid var(--bdr);background:var(--surf2);color:var(--tx);transition:border-color var(--tr)}
+.sel:focus{outline:none;border-color:var(--red)}
+.vtog{display:flex;gap:2px;background:var(--surfo);border-radius:var(--r2);padding:2px}
+.vb-btn{padding:var(--s1) var(--s2);border-radius:calc(var(--r2) - 2px);font-size:var(--xs);transition:all var(--tr);color:var(--txm)}
+.vb-btn.on{background:var(--surf2);color:var(--tx);box-shadow:var(--sh1)}
+
+/* ══ MAIN ══ */
+.main{max-width:1340px;margin:0 auto;padding:var(--s6) var(--s6) var(--s16)}
+
+/* ══ GRID ══ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,100%),1fr));gap:var(--s4)}
+.grid.hidden{display:none}
+
+/* ══ CARD ══ */
+.card{background:var(--surf);border:1.5px solid var(--bdr);border-radius:var(--r3);overflow:hidden;cursor:pointer;position:relative;display:flex;flex-direction:column;transition:box-shadow var(--tr),transform var(--tr),border-color var(--tr)}
+.card:hover{box-shadow:var(--sh2);transform:translateY(-3px);border-color:var(--red)}
+.card:active{transform:translateY(-1px)}
+.card.coll{border-color:var(--goldbdr);background:var(--goldbg)}
+.card.wish{border-color:var(--bluebdr);background:var(--bluebg)}
+.card.coll.wish{border-color:var(--goldbdr)}
+.c-num{position:absolute;top:0;left:0;z-index:2;font-family:var(--fd);font-size:var(--xs);font-weight:700;letter-spacing:.04em;background:var(--red);color:#fff;padding:2px 7px;border-radius:0 0 var(--r1) 0;line-height:1.4}
+.card.coll .c-num{background:var(--gold)}
+.card.wish .c-num{background:var(--blue)}
+.card.coll.wish .c-num{background:var(--gold)}
+.c-badges{position:absolute;top:var(--s1);right:var(--s1);z-index:2;display:flex;gap:2px}
+.bdg{width:18px;height:18px;border-radius:var(--rf);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.bdg-c{background:var(--gold);color:#fff}.bdg-w{background:var(--blue);color:#fff}
+.c-img-wrap{width:100%;aspect-ratio:4/3;background:var(--surfo);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.c-img{width:100%;height:100%;object-fit:contain;padding:var(--s3);transition:transform .3s cubic-bezier(.16,1,.3,1),opacity .3s}
+.card:hover .c-img{transform:scale(1.08)}
+.c-img.loading{opacity:0}.c-img.loaded{opacity:1}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.c-skel,.l-skel,.m-skel{background:linear-gradient(90deg,var(--surfo) 25%,var(--surf2) 50%,var(--surfo) 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite}
+.c-skel{position:absolute;inset:0}
+.c-img.loaded~.c-skel,.c-img.err~.c-skel{display:none}
+.c-fallback{display:none;font-size:2.4rem;position:absolute;inset:0;align-items:center;justify-content:center}
+.c-img.err~.c-fallback{display:flex}
+.c-body{padding:var(--s2) var(--s3) var(--s1);flex:1;display:flex;flex-direction:column;gap:1px}
+.c-name{font-size:var(--xs);font-weight:700;line-height:1.35}
+.c-brand{font-size:var(--xs);color:var(--txm)}
+.c-stars{font-size:10px;color:var(--gold);line-height:1;margin-top:2px}
+.c-note{font-size:9px;color:var(--txm);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:2px}
+.c-actions{display:flex;gap:var(--s2);padding:var(--s2) var(--s3) var(--s3)}
+.act{flex:1;min-height:30px;padding:2px var(--s2);border-radius:var(--r1);border:1.5px solid var(--bdr);font-size:10px;font-weight:600;background:var(--surf2);color:var(--txm);display:flex;align-items:center;justify-content:center;gap:3px;transition:all var(--tr)}
+.act:hover:not(.ac-c):not(.ac-w){border-color:var(--gold);color:var(--gold)}
+.act.wb:hover:not(.ac-w){border-color:var(--blue);color:var(--blue)}
+.act.ac-c{border-color:var(--gold);background:var(--gold);color:#fff}
+.act.ac-w{border-color:var(--blue);background:var(--blue);color:#fff}
+
+/* ══ LIST VIEW ══ */
+.listv{display:none;flex-direction:column;gap:var(--s2)}
+.listv.vis{display:flex}
+.lrow{display:flex;align-items:center;gap:var(--s4);background:var(--surf);border:1.5px solid var(--bdr);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all var(--tr)}
+.lrow:hover{border-color:var(--red);box-shadow:var(--sh1);transform:translateX(3px)}
+.lrow.coll{border-color:var(--goldbdr);background:var(--goldbg)}
+.lrow.wish{border-color:var(--bluebdr);background:var(--bluebg)}
+.l-img-wrap{width:80px;height:60px;flex-shrink:0;overflow:hidden;background:var(--surfo);display:flex;align-items:center;justify-content:center;position:relative}
+.l-img{width:100%;height:100%;object-fit:contain;padding:var(--s2);transition:opacity .3s}
+.l-img.loading{opacity:0}.l-img.loaded{opacity:1}
+.l-skel{position:absolute;inset:0}
+.l-img.loaded~.l-skel,.l-img.err~.l-skel{display:none}
+.l-fallback{display:none;font-size:1.5rem;position:absolute;inset:0;align-items:center;justify-content:center}
+.l-img.err~.l-fallback{display:flex}
+.l-num{font-family:var(--fd);font-size:var(--sm);font-weight:700;color:var(--red);min-width:46px;padding-left:var(--s3)}
+.lrow.coll .l-num{color:var(--gold)}.lrow.wish .l-num{color:var(--blue)}
+.l-info{flex:1;padding:var(--s2) 0;min-width:0}
+.l-name{font-size:var(--sm);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.l-brand{font-size:var(--xs);color:var(--txm)}
+.l-acts{display:flex;gap:var(--s2);padding-right:var(--s3)}
+.lact{width:32px;height:32px;border-radius:var(--r1);border:1.5px solid var(--bdr);font-size:11px;font-weight:700;background:var(--surf2);color:var(--txm);display:flex;align-items:center;justify-content:center;transition:all var(--tr)}
+.lact:hover{border-color:var(--gold);color:var(--gold)}
+.lact.wb:hover{border-color:var(--blue);color:var(--blue)}
+.lact.ac-c{border-color:var(--gold);background:var(--gold);color:#fff}
+.lact.ac-w{border-color:var(--blue);background:var(--blue);color:#fff}
+
+/* ══ EMPTY ══ */
+.empty{display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--s16);gap:var(--s4);color:var(--txm);text-align:center}
+.empty svg{opacity:.25}
+.empty p{max-width:28ch;font-size:var(--sm)}
+
+/* ══ MODAL ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:var(--s4)}
+.overlay.open{display:flex}
+.modal{background:var(--surf2);border-radius:var(--r4);width:100%;max-width:480px;box-shadow:var(--sh3);overflow:hidden;display:flex;flex-direction:column;max-height:90dvh;overflow-y:auto}
+.modal-img-wrap{width:100%;height:180px;background:var(--surfo);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;flex-shrink:0}
+.modal-img{width:100%;height:100%;object-fit:contain;padding:var(--s6);transition:opacity .3s}
+.modal-img.loading{opacity:0}.modal-img.loaded{opacity:1}
+.m-skel{position:absolute;inset:0}
+.modal-img.loaded~.m-skel,.modal-img.err~.m-skel{display:none}
+.m-fallback{display:none;font-size:3.5rem;position:absolute;inset:0;align-items:center;justify-content:center}
+.modal-img.err~.m-fallback{display:flex}
+.modal-body{padding:var(--s5) var(--s6) var(--s6)}
+.modal-title{font-family:var(--fd);font-size:var(--lg);font-weight:700;margin-bottom:var(--s4)}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin-bottom:var(--s3)}
+.chk-lbl{display:flex;align-items:center;gap:var(--s2);font-size:var(--sm);cursor:pointer;padding:var(--s2) var(--s3);border-radius:var(--r2);border:1.5px solid var(--bdr);background:var(--surf);transition:all var(--tr)}
+.chk-lbl input{display:none}
+.chk-icon{width:20px;height:20px;border-radius:var(--r1);border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all var(--tr);flex-shrink:0}
+.chk-lbl.coll-lbl.checked{border-color:var(--goldbdr);background:var(--goldbg)}
+.chk-lbl.coll-lbl.checked .chk-icon{background:var(--gold);border-color:var(--gold);color:#fff}
+.chk-lbl.wish-lbl.checked{border-color:var(--bluebdr);background:var(--bluebg)}
+.chk-lbl.wish-lbl.checked .chk-icon{background:var(--blue);border-color:var(--blue);color:#fff}
+.m-lbl{font-size:var(--xs);color:var(--txm);display:block;margin-bottom:var(--s1)}
+.m-input{width:100%;padding:var(--s2) var(--s3);border:1.5px solid var(--bdr);border-radius:var(--r2);background:var(--surf);resize:vertical;min-height:72px;font-size:var(--sm);margin-bottom:var(--s3)}
+.m-input:focus{outline:none;border-color:var(--red)}
+.stars-row{display:flex;gap:var(--s2);margin-bottom:var(--s4)}
+.star{font-size:1.5rem;cursor:pointer;transition:transform var(--tr);line-height:1}
+.star:hover{transform:scale(1.25)}
+.m-footer{display:flex;justify-content:flex-end;gap:var(--s3)}
+.btn-x{padding:var(--s2) var(--s4);border:1.5px solid var(--bdr);border-radius:var(--r2);font-size:var(--sm);background:none;color:var(--txm);transition:all var(--tr)}
+.btn-x:hover{border-color:var(--txm);color:var(--tx)}
+.btn-s{padding:var(--s2) var(--s6);border-radius:var(--r2);font-size:var(--sm);font-weight:700;background:var(--red);color:#fff;border:none;transition:background var(--tr)}
+.btn-s:hover{background:var(--redh)}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:var(--s6);right:var(--s6);z-index:999;
+  background:var(--tx);color:var(--surf2);
+  padding:var(--s3) var(--s5);border-radius:var(--r3);
+  font-size:var(--sm);box-shadow:var(--sh3);
+  transform:translateY(100px);opacity:0;
+  transition:transform .3s cubic-bezier(.16,1,.3,1),opacity .3s;
+  pointer-events:none;max-width:280px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:600px){
+  .hdr-i,.stats,.ctrl,.ctrl-i,.main{padding-left:var(--s4);padding-right:var(--s4)}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(min(145px,100%),1fr));gap:var(--s3)}
+  .logo-text{font-size:1.05rem}
+  .user-chip{max-width:100px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="38" height="38" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="7" fill="white"/>
+          <rect x="3" y="17" width="30" height="11" rx="3" fill="#c41e1e"/>
+          <rect x="6" y="13" width="18" height="8" rx="2" fill="#c41e1e"/>
+          <circle cx="10" cy="28" r="3.5" fill="#222"/><circle cx="10" cy="28" r="1.8" fill="#bbb"/>
+          <circle cx="26" cy="28" r="3.5" fill="#222"/><circle cx="26" cy="28" r="1.8" fill="#bbb"/>
+          <rect x="22" y="18" width="8" height="5" rx="1" fill="#90caf9" opacity=".85"/>
+        </svg>
+        <div>
+          <div class="auth-title">TOMICA TRACKER</div>
+          <div class="auth-sub">コレクション管理</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- loading state -->
+    <div class="auth-loading" id="auth-loading">
+      <div class="spinner"></div>
+      接続中...
+    </div>
+
+    <!-- tabs -->
+    <div class="auth-tabs" id="auth-tabs" style="display:none">
+      <button class="atab on" data-tab="login">ログイン</button>
+      <button class="atab" data-tab="register">新規登録</button>
+    </div>
+
+    <div class="auth-body" id="auth-body" style="display:none">
+      <!-- Login form -->
+      <form class="auth-form" id="login-form">
+        <div class="auth-err" id="login-err"></div>
+        <div class="f-group">
+          <label class="f-lbl" for="l-email">メールアドレス</label>
+          <input class="f-inp" type="email" id="l-email" placeholder="your@email.com" required autocomplete="email">
+        </div>
+        <div class="f-group">
+          <label class="f-lbl" for="l-pass">パスワード</label>
+          <input class="f-inp" type="password" id="l-pass" placeholder="パスワード" required autocomplete="current-password">
+        </div>
+        <button class="btn-primary" type="submit" id="login-btn">ログイン</button>
+      </form>
+      <div style="margin-top:var(--s3);text-align:right"><button type="button" id="forgot-btn" style="font-size:var(--xs);color:var(--red);font-weight:600">パスワードをお忘れですか？</button></div>
+
+      <!-- Register form -->
+      <form class="auth-form hidden" id="reg-form">
+        <div class="auth-err" id="reg-err"></div>
+        <div class="auth-ok" id="reg-ok"></div>
+        <div class="f-group">
+          <label class="f-lbl" for="r-name">表示名</label>
+          <input class="f-inp" type="text" id="r-name" placeholder="コレクター名" required autocomplete="nickname">
+        </div>
+        <div class="f-group">
+          <label class="f-lbl" for="r-email">メールアドレス</label>
+          <input class="f-inp" type="email" id="r-email" placeholder="your@email.com" required autocomplete="email">
+        </div>
+        <div class="f-group">
+          <label class="f-lbl" for="r-pass">パスワード（6文字以上）</label>
+          <input class="f-inp" type="password" id="r-pass" placeholder="パスワード" required minlength="6" autocomplete="new-password">
+        </div>
+        <button class="btn-primary" type="submit" id="reg-btn">アカウント作成</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="verify-screen" style="display:none;position:fixed;inset:0;z-index:450;align-items:center;justify-content:center;background:var(--bg);padding:var(--s4)">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="38" height="38" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="7" fill="white"/>
+          <rect x="3" y="17" width="30" height="11" rx="3" fill="#c41e1e"/>
+          <rect x="6" y="13" width="18" height="8" rx="2" fill="#c41e1e"/>
+          <circle cx="10" cy="28" r="3.5" fill="#222"/><circle cx="10" cy="28" r="1.8" fill="#bbb"/>
+          <circle cx="26" cy="28" r="3.5" fill="#222"/><circle cx="26" cy="28" r="1.8" fill="#bbb"/>
+        </svg>
+        <div><div class="auth-title">EMAIL VERIFY</div><div class="auth-sub">メール認証が必要です</div></div>
+      </div>
+    </div>
+    <div class="auth-body" style="display:block">
+      <p style="font-size:var(--sm);color:var(--txm);line-height:1.7;margin-bottom:var(--s4)">登録したメールアドレスに確認メールを送信しました。メール内のリンクをクリックして認証を完了してください。</p>
+      <div class="auth-ok show" id="verify-ok" style="margin-bottom:var(--s3)">確認メールを送信しました。</div>
+      <div class="auth-err" id="verify-err" style="margin-bottom:var(--s3)"></div>
+      <div style="display:flex;flex-direction:column;gap:var(--s3)">
+        <button class="btn-primary" type="button" id="check-verify-btn">認証状態を確認</button>
+        <button class="btn-x" type="button" id="resend-verify-btn">確認メールを再送信</button>
+        <button class="btn-x" type="button" id="verify-logout-btn">ログアウト</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app">
+  <header class="hdr">
+    <div class="hdr-i">
+      <div class="logo">
+        <svg class="logo-svg" viewBox="0 0 36 36" fill="none" aria-label="Logo">
+          <rect width="36" height="36" rx="7" fill="white"/>
+          <rect x="3" y="17" width="30" height="11" rx="3" fill="#c41e1e"/>
+          <rect x="6" y="13" width="18" height="8" rx="2" fill="#c41e1e"/>
+          <circle cx="10" cy="28" r="3.5" fill="#222"/><circle cx="10" cy="28" r="1.8" fill="#bbb"/>
+          <circle cx="26" cy="28" r="3.5" fill="#222"/><circle cx="26" cy="28" r="1.8" fill="#bbb"/>
+          <rect x="22" y="18" width="8" height="5" rx="1" fill="#90caf9" opacity=".85"/>
+        </svg>
+        <div>
+          <div class="logo-text">TOMICA TRACKER</div>
+          <div class="logo-sub">コレクション管理</div>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <div class="user-chip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span id="user-label">-</span>
+        </div>
+        <button class="icon-btn" id="lang-btn" aria-label="Language toggle" title="日本語 / English">JP</button>
+        <button class="icon-btn" data-theme-toggle aria-label="テーマ切替">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+        <button class="icon-btn" id="logout-btn" aria-label="ログアウト" title="ログアウト">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stats-i">
+      <div class="stat"><span class="stat-lbl">総数</span><span class="stat-val">150</span></div>
+      <div class="stat"><span class="stat-lbl">所持</span><span class="stat-val vg" id="sc">0</span></div>
+      <div class="stat"><span class="stat-lbl">ほしい</span><span class="stat-val vb" id="sw">0</span></div>
+      <div class="stat"><span class="stat-lbl">未所持</span><span class="stat-val vr" id="sm">150</span></div>
+      <div class="prog-wrap">
+        <div class="prog-bar"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+        <div class="prog-lbl" id="pl">0 / 150 (0%)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sync-bar hidden" id="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-msg">同期済み</span>
+  </div>
+
+  <div class="ctrl">
+    <div class="ctrl-i">
+      <div class="srch-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="srch" type="search" id="si" placeholder="車名・ブランド・番号で検索..." aria-label="検索">
+      </div>
+      <div class="fbtns">
+        <button class="fb on" data-f="all">すべて</button>
+        <button class="fb gold" data-f="coll">✓ 所持</button>
+        <button class="fb blue" data-f="wish">♥ ほしい</button>
+        <button class="fb" data-f="miss">未所持</button>
+      </div>
+      <select class="sel" id="bf" aria-label="ブランド"><option value="">全ブランド</option></select>
+      <div class="vtog">
+        <button class="vb-btn on" data-v="grid" aria-label="グリッド">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button class="vb-btn" data-v="list" aria-label="リスト">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <div id="gc" class="grid" role="list"></div>
+    <div id="lc" class="listv" role="list"></div>
+    <div class="empty" id="es">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>検索結果が見つかりません</p>
+    </div>
+  </main>
+</div>
+
+<!-- ══ DETAIL MODAL ══ -->
+<div class="overlay" id="ov" role="dialog" aria-modal="true" aria-labelledby="mt">
+  <div class="modal">
+    <div class="modal-img-wrap">
+      <img class="modal-img loading" id="mi" src="" alt="" width="460" height="180" decoding="async">
+      <div class="m-skel"></div>
+      <div class="m-fallback" id="mf"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-title" id="mt"></div>
+      <div class="modal-row">
+        <label class="chk-lbl coll-lbl" id="coll-lbl">
+          <input type="checkbox" id="mc">
+          <span class="chk-icon">✓</span>
+          <span>所持している</span>
+        </label>
+        <label class="chk-lbl wish-lbl" id="wish-lbl">
+          <input type="checkbox" id="mw">
+          <span class="chk-icon">♥</span>
+          <span>ほしいリスト</span>
+        </label>
+      </div>
+      <label class="m-lbl" for="mn">メモ</label>
+      <textarea class="m-input" id="mn" placeholder="購入日、カラー、状態など..."></textarea>
+      <label class="m-lbl">評価</label>
+      <div class="stars-row" id="msr">
+        <span class="star" data-s="1">☆</span><span class="star" data-s="2">☆</span>
+        <span class="star" data-s="3">☆</span><span class="star" data-s="4">☆</span>
+        <span class="star" data-s="5">☆</span>
+      </div>
+      <div class="m-footer">
+        <button class="btn-x" id="mcl">キャンセル</button>
+        <button class="btn-s" id="msv">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ FIREBASE + APP SCRIPT ══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail, sendEmailVerification, reload } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAox2tB7upFleQ0t0_xPpctqb-VWDa2Njg",
+  authDomain: "tomica-tracker.firebaseapp.com",
+  projectId: "tomica-tracker",
+  storageBucket: "tomica-tracker.firebasestorage.app",
+  messagingSenderId: "213875444677",
+  appId: "1:213875444677:web:d6d5d5c32a6ecf138cd9ac"
+};
+
+const fapp = initializeApp(firebaseConfig);
+const auth = getAuth(fapp);
+const db   = getFirestore(fapp);
+
+// ── MODELS ──
+const IMG_BASE = "https://www.takaratomy.co.jp/products/tomica/lineup/regular/images/";
+const MODELS = [
+  [1, "日産 GT-R (R35)", "日産"],
+  [2, "トヨタ ランドクルーザー 300", "トヨタ"],
+  [3, "ホンダ N-BOX", "ホンダ"],
+  [4, "日産 フェアレディZ (Z34)", "日産"],
+  [5, "トヨタ GR86", "トヨタ"],
+  [6, "マツダ CX-5", "マツダ"],
+  [7, "スバル WRX S4", "スバル"],
+  [8, "三菱 アウトランダーPHEV", "三菱"],
+  [9, "ホンダ ヴェゼル", "ホンダ"],
+  [10, "トヨタ アルファード", "トヨタ"],
+  [11, "日産 サクラ", "日産"],
+  [12, "スズキ ジムニー", "スズキ"],
+  [13, "トヨタ カローラ", "トヨタ"],
+  [14, "ホンダ シビックタイプR", "ホンダ"],
+  [15, "日産 ノート e-POWER", "日産"],
+  [16, "マツダ ロードスター", "マツダ"],
+  [17, "スバル フォレスター", "スバル"],
+  [18, "トヨタ ヤリス", "トヨタ"],
+  [19, "ホンダ フィット", "ホンダ"],
+  [20, "日産 エクストレイル", "日産"],
+  [21, "トヨタ C-HR", "トヨタ"],
+  [22, "マツダ MAZDA3", "マツダ"],
+  [23, "スズキ スイフトスポーツ", "スズキ"],
+  [24, "ホンダ ステップワゴン", "ホンダ"],
+  [25, "トヨタ ハイエース", "トヨタ"],
+  [26, "日産 セレナ", "日産"],
+  [27, "トヨタ プリウス", "トヨタ"],
+  [28, "ホンダ フリード", "ホンダ"],
+  [29, "三菱 デリカD:5", "三菱"],
+  [30, "スバル レヴォーグ", "スバル"],
+  [31, "日産 キャラバン", "日産"],
+  [32, "トヨタ ヴォクシー", "トヨタ"],
+  [33, "ホンダ オデッセイ", "ホンダ"],
+  [34, "スズキ エブリイ", "スズキ"],
+  [35, "マツダ CX-8", "マツダ"],
+  [36, "トヨタ RAV4", "トヨタ"],
+  [37, "日産 ムラーノ", "日産"],
+  [38, "ホンダ CR-V", "ホンダ"],
+  [39, "トヨタ ハリアー", "トヨタ"],
+  [40, "スバル アウトバック", "スバル"],
+  [41, "日産 リーフ", "日産"],
+  [42, "トヨタ bZ4X", "トヨタ"],
+  [43, "ホンダ e", "ホンダ"],
+  [44, "マツダ MX-30", "マツダ"],
+  [45, "スズキ ソリオ", "スズキ"],
+  [46, "トヨタ シエンタ", "トヨタ"],
+  [47, "日産 デイズ", "日産"],
+  [48, "ホンダ N-WGN", "ホンダ"],
+  [49, "スズキ アルト", "スズキ"],
+  [50, "ダイハツ タント", "ダイハツ"],
+  [51, "トヨタ ルーミー", "トヨタ"],
+  [52, "日産 ルークス", "日産"],
+  [53, "ホンダ N-ONE", "ホンダ"],
+  [54, "スズキ ワゴンR", "スズキ"],
+  [55, "ダイハツ ムーヴ", "ダイハツ"],
+  [56, "トヨタ ピクシス", "トヨタ"],
+  [57, "日産 クリッパー", "日産"],
+  [58, "ホンダ バモス", "ホンダ"],
+  [59, "スズキ キャリイ", "スズキ"],
+  [60, "ダイハツ ハイゼット", "ダイハツ"],
+  [61, "トヨタ コースター", "トヨタ"],
+  [62, "日産 シビリアン", "日産"],
+  [63, "三菱 ローザ", "三菱"],
+  [64, "いすゞ エルフ", "いすゞ"],
+  [65, "トヨタ ダイナ", "トヨタ"],
+  [66, "日野 デュトロ", "日野"],
+  [67, "三菱ふそう キャンター", "三菱ふそう"],
+  [68, "いすゞ フォワード", "いすゞ"],
+  [69, "日野 レンジャー", "日野"],
+  [70, "三菱ふそう ファイター", "三菱ふそう"],
+  [71, "日野 プロフィア", "日野"],
+  [72, "いすゞ ギガ", "いすゞ"],
+  [73, "三菱ふそう スーパーグレート", "三菱ふそう"],
+  [74, "UDトラックス クオン", "UDトラックス"],
+  [75, "トヨタ メガクルーザー", "トヨタ"],
+  [76, "日産 パトロール", "日産"],
+  [77, "トヨタ FJクルーザー", "トヨタ"],
+  [78, "スズキ ジムニーシエラ", "スズキ"],
+  [79, "三菱 パジェロ", "三菱"],
+  [80, "ホンダ クロスカブ", "ホンダ"],
+  [81, "警視庁 パトカー (クラウン)", "警察"],
+  [82, "東京消防庁 ポンプ車", "消防"],
+  [83, "救急車 (ハイメディック)", "救急"],
+  [84, "道路工事車両", "作業車"],
+  [85, "除雪車", "作業車"],
+  [86, "ゴミ収集車", "作業車"],
+  [87, "コンクリートミキサー車", "作業車"],
+  [88, "クレーン車", "作業車"],
+  [89, "ショベルカー", "作業車"],
+  [90, "ブルドーザー", "作業車"],
+  [91, "フォークリフト", "作業車"],
+  [92, "空港グランドバス", "バス"],
+  [93, "路線バス", "バス"],
+  [94, "観光バス", "バス"],
+  [95, "スクールバス", "バス"],
+  [96, "トヨタ ハイブリッドタクシー", "トヨタ"],
+  [97, "日産 タクシー NV200", "日産"],
+  [98, "ジャパンタクシー", "トヨタ"],
+  [99, "ヘリコプター (警察)", "警察"],
+  [100, "ドクターヘリ", "救急"],
+  [101, "フェラーリ F8 トリブート", "フェラーリ"],
+  [102, "ランボルギーニ ウラカン", "ランボルギーニ"],
+  [103, "ポルシェ 911 カレラ", "ポルシェ"],
+  [104, "メルセデス AMG GT", "メルセデス"],
+  [105, "BMW M4 クーペ", "BMW"],
+  [106, "アウディ R8", "アウディ"],
+  [107, "フォード マスタング", "フォード"],
+  [108, "シボレー カマロ", "シボレー"],
+  [109, "ダッジ チャレンジャー", "ダッジ"],
+  [110, "ジープ ラングラー", "ジープ"],
+  [111, "レンジローバー", "ランドローバー"],
+  [112, "ベントレー コンチネンタルGT", "ベントレー"],
+  [113, "ロールス・ロイス ファントム", "ロールス・ロイス"],
+  [114, "マクラーレン 720S", "マクラーレン"],
+  [115, "アストンマーティン DB11", "アストンマーティン"],
+  [116, "ブガッティ シロン", "ブガッティ"],
+  [117, "コーニック One:1", "コーニック"],
+  [118, "パガーニ ウアイラ", "パガーニ"],
+  [119, "テスラ モデル S", "テスラ"],
+  [120, "テスラ モデル X", "テスラ"],
+  [121, "VW ビートル", "フォルクスワーゲン"],
+  [122, "フィアット 500", "フィアット"],
+  [123, "MINI クーパー", "MINI"],
+  [124, "スマート フォーツー", "スマート"],
+  [125, "プジョー 208", "プジョー"],
+  [126, "シトロエン C3", "シトロエン"],
+  [127, "アルファロメオ ジュリア", "アルファロメオ"],
+  [128, "マセラティ グラントゥーリズモ", "マセラティ"],
+  [129, "ボルボ XC90", "ボルボ"],
+  [130, "ルノー メガーヌ R.S.", "ルノー"],
+  [131, "F1 マシン (レッドブル)", "F1"],
+  [132, "F1 マシン (フェラーリ)", "F1"],
+  [133, "F1 マシン (メルセデス)", "F1"],
+  [134, "インディカー", "レーシング"],
+  [135, "スーパーGT GT500", "レーシング"],
+  [136, "ル・マン プロトタイプ", "レーシング"],
+  [137, "ラリーカー (WRC)", "レーシング"],
+  [138, "NASCAR", "レーシング"],
+  [139, "ドラッグレースカー", "レーシング"],
+  [140, "フォーミュラE", "レーシング"],
+  [141, "トヨタ スープラ (A80)", "トヨタ"],
+  [142, "日産 スカイライン GT-R (R34)", "日産"],
+  [143, "ホンダ NSX (NA1)", "ホンダ"],
+  [144, "マツダ RX-7 (FD)", "マツダ"],
+  [145, "三菱 ランサーエボリューション", "三菱"],
+  [146, "スバル インプレッサ WRX STI", "スバル"],
+  [147, "ホンダ S2000", "ホンダ"],
+  [148, "トヨタ セリカ (T230)", "トヨタ"],
+  [149, "日産 シルビア (S15)", "日産"],
+  [150, "マツダ ユーノスロードスター", "マツダ"],
+];
+const EMOJI = {"日産":"🔵","トヨタ":"🔴","ホンダ":"⚪","マツダ":"🔶","スバル":"🌟","スズキ":"🟢","三菱":"⬛","ダイハツ":"🟡","いすゞ":"🟤","日野":"🔷","三菱ふそう":"🔳","UDトラックス":"🟧","警察":"🚔","消防":"🚒","救急":"🚑","作業車":"🚧","バス":"🚌","F1":"🏎","レーシング":"🏁","テスラ":"⚡","フェラーリ":"🐎","ランボルギーニ":"🐂","ポルシェ":"🟨","BMW":"🔵","メルセデス":"⭐","アウディ":"⭕","フォード":"🔵","シボレー":"🟡","ダッジ":"🔴","ジープ":"🟢","ランドローバー":"🟩","ベントレー":"🪶","ロールス・ロイス":"👑","マクラーレン":"🧡","アストンマーティン":"🌿","ブガッティ":"💙","コーニック":"🤍","パガーニ":"🖤","フォルクスワーゲン":"⬤","フィアット":"🔴","MINI":"🎯","スマート":"💚","プジョー":"🦁","シトロエン":"⚙","アルファロメオ":"🍀","マセラティ":"🔱","ボルボ":"🔷","ルノー":"💎"};
+function em(b){return EMOJI[b]||"🚗"}
+
+// ── STATE ──
+let S={}, currentUser=null, syncTimer=null, curF="all", curB="", curV="grid", curM=null, curR=0;
+function gs(n){return S[n]||{coll:false,wish:false,note:"",rating:0}}
+
+// ── FIRESTORE ──
+async function loadCloud(){
+  if(!currentUser) return;
+  try{
+    const ref=doc(db,"users",currentUser.uid,"data","collection");
+    const snap=await getDoc(ref);
+    if(snap.exists()) S=snap.data()||{};
+    else S={};
+  }catch(e){console.warn("load err",e)}
+}
+function scheduleSave(){
+  setSyncStatus("syncing","保存中...");
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(saveCloud,1200);
+}
+async function saveCloud(){
+  if(!currentUser) return;
+  try{
+    const ref=doc(db,"users",currentUser.uid,"data","collection");
+    await setDoc(ref,S,{merge:true});
+    setSyncStatus("saved","クラウドに保存しました ✓");
+    setTimeout(()=>document.getElementById("sync-bar").classList.add("hidden"),2500);
+  }catch(e){setSyncStatus("err","保存エラー。再試行中...")}
+}
+function setSyncStatus(type,msg){
+  const bar=document.getElementById("sync-bar"),dot=document.getElementById("sync-dot"),m=document.getElementById("sync-msg");
+  bar.classList.remove("hidden");
+  dot.className="sync-dot "+type;
+  m.textContent=msg;
+}
+
+// ── TOAST ──
+let toastT;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+// ── RENDER ──
+const gc=document.getElementById("gc"),lc=document.getElementById("lc"),es=document.getElementById("es");
+
+function updateStats(){
+  let c=0,w=0;
+  MODELS.forEach(m=>{const s=gs(m[0]);if(s.coll)c++;if(s.wish)w++;});
+  document.getElementById("sc").textContent=c;
+  document.getElementById("sw").textContent=w;
+  document.getElementById("sm").textContent=150-c;
+  const p=Math.round(c/150*100);
+  document.getElementById("pf").style.width=p+"%";
+  document.getElementById("pl").textContent=c+" / 150 ("+p+"%)";
+}
+
+function imgURL(n){return IMG_BASE+String(n).padStart(3,"0")+".jpg"}
+function attachImg(el,n,fb){
+  el.classList.add("loading");el.src=imgURL(n);
+  el.onload=()=>{el.classList.remove("loading");el.classList.add("loaded")};
+  el.onerror=()=>{el.classList.remove("loading");el.classList.add("err");if(fb)fb.textContent=em(MODELS.find(m=>m[0]===n)?.[2]||"")};
+}
+
+function getFiltered(){
+  const q=document.getElementById("si").value.toLowerCase(),b=document.getElementById("bf").value;
+  return MODELS.filter(m=>{
+    const s=gs(m[0]);
+    return(!q||m[1].toLowerCase().includes(q)||m[2].toLowerCase().includes(q)||String(m[0]).includes(q))
+      &&(!b||m[2]===b)
+      &&(curF==="all"||(curF==="coll"&&s.coll)||(curF==="wish"&&s.wish)||(curF==="miss"&&!s.coll));
+  });
+}
+
+function makeCard(m){
+  const [n,name,brand]=m,s=gs(n);
+  const d=document.createElement("div");
+  d.className="card"+(s.coll?" coll":"")+(s.wish?" wish":"");
+  d.dataset.id=n;d.setAttribute("role","listitem");d.setAttribute("tabindex","0");
+  d.innerHTML=`<div class="c-num">No.${String(n).padStart(3,"0")}</div>
+    <div class="c-badges">${s.coll?'<span class="bdg bdg-c">✓</span>':""} ${s.wish?'<span class="bdg bdg-w">♥</span>':""}</div>
+    <div class="c-img-wrap">
+      <img class="c-img loading" src="" alt="${name}" width="170" height="128" loading="lazy" decoding="async">
+      <div class="c-skel"></div><div class="c-fallback">${em(brand)}</div>
+    </div>
+    <div class="c-body">
+      <div class="c-name">${name}</div><div class="c-brand">${brand}</div>
+      ${s.rating>0?`<div class="c-stars">${"★".repeat(s.rating)}${"☆".repeat(5-s.rating)}</div>`:""}
+      ${s.note?`<div class="c-note">${s.note}</div>`:""}
+    </div>
+    <div class="c-actions">
+      <button class="act${s.coll?" ac-c":""}" data-a="coll" data-id="${n}">${s.coll?"✓ 所持":"＋ 所持"}</button>
+      <button class="act wb${s.wish?" ac-w":""}" data-a="wish" data-id="${n}">${s.wish?"♥":"♡"}</button>
+    </div>`;
+  const img=d.querySelector(".c-img"),fb=d.querySelector(".c-fallback");
+  new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){attachImg(img,n,fb);o.disconnect()}})},{rootMargin:"200px"}).observe(img);
+  return d;
+}
+
+function makeListRow(m){
+  const [n,name,brand]=m,s=gs(n);
+  const d=document.createElement("div");
+  d.className="lrow"+(s.coll?" coll":"")+(s.wish?" wish":"");
+  d.dataset.id=n;d.setAttribute("role","listitem");
+  d.innerHTML=`<div class="l-img-wrap">
+      <img class="l-img loading" src="" alt="${name}" width="80" height="60" loading="lazy" decoding="async">
+      <div class="l-skel"></div><div class="l-fallback">${em(brand)}</div>
+    </div>
+    <div class="l-num">No.${String(n).padStart(3,"0")}</div>
+    <div class="l-info"><div class="l-name">${name}</div><div class="l-brand">${brand}${s.rating>0?" · "+"★".repeat(s.rating):""}</div></div>
+    <div class="l-acts">
+      <button class="lact${s.coll?" ac-c":""}" data-a="coll" data-id="${n}">${s.coll?"✓":"＋"}</button>
+      <button class="lact wb${s.wish?" ac-w":""}" data-a="wish" data-id="${n}">${s.wish?"♥":"♡"}</button>
+      <button class="lact" data-a="note" data-id="${n}">📝</button>
+    </div>`;
+  const img=d.querySelector(".l-img"),fb=d.querySelector(".l-fallback");
+  new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){attachImg(img,n,fb);o.disconnect()}})},{rootMargin:"300px"}).observe(img);
+  return d;
+}
+
+function render(){
+  gc.innerHTML="";lc.innerHTML="";
+  const items=getFiltered();
+  es.style.display=items.length===0?"flex":"none";
+  items.forEach(m=>{gc.appendChild(makeCard(m));lc.appendChild(makeListRow(m));});
+  updateStats();
+}
+
+// ── EVENT DELEGATION ──
+document.addEventListener("click",e=>{
+  const ab=e.target.closest("[data-a]");
+  if(ab){
+    e.stopPropagation();
+    const id=parseInt(ab.dataset.id),a=ab.dataset.a,s=gs(id);
+    if(a==="coll"){s.coll=!s.coll;S[id]=s;scheduleSave();render();toast(s.coll?"✓ 所持に追加しました":"所持を解除しました")}
+    else if(a==="wish"){s.wish=!s.wish;S[id]=s;scheduleSave();render();toast(s.wish?"♥ ほしいリストに追加":"ほしいリストから削除")}
+    else if(a==="note") openModal(id);
+    return;
+  }
+  const card=e.target.closest(".card,.lrow");
+  if(card&&card.dataset.id) openModal(parseInt(card.dataset.id));
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeModal();
+  if((e.key==="Enter"||e.key===" ")&&e.target.closest(".card")){e.preventDefault();openModal(parseInt(e.target.closest(".card").dataset.id))}
+});
+
+// ── MODAL ──
+function openModal(id){
+  curM=id;curR=gs(id).rating||0;
+  const m=MODELS.find(x=>x[0]===id),s=gs(id);
+  document.getElementById("mt").textContent=`No.${String(id).padStart(3,"0")} ${m[1]}`;
+  const mc=document.getElementById("mc"),mw=document.getElementById("mw");
+  mc.checked=s.coll;mw.checked=s.wish;
+  document.getElementById("mn").value=s.note||"";
+  document.getElementById("coll-lbl").classList.toggle("checked",s.coll);
+  document.getElementById("wish-lbl").classList.toggle("checked",s.wish);
+  const mi=document.getElementById("mi"),mf=document.getElementById("mf");
+  mi.className="modal-img loading";mi.src="";mf.textContent=em(m[2]);
+  attachImg(mi,id,mf);
+  updateModalStars(curR);
+  document.getElementById("ov").classList.add("open");
+  setTimeout(()=>document.getElementById("mn").focus(),100);
+}
+function closeModal(){document.getElementById("ov").classList.remove("open");curM=null}
+function updateModalStars(r){
+  document.getElementById("msr").querySelectorAll(".star").forEach((s,i)=>{
+    s.textContent=i<r?"★":"☆";s.style.color=i<r?"var(--gold)":"var(--txf)";
+  });
+}
+document.getElementById("msr").addEventListener("click",e=>{
+  const s=e.target.closest(".star");if(s){curR=parseInt(s.dataset.s);updateModalStars(curR)}
+});
+// sync checkbox UI
+["mc","mw"].forEach(id=>{
+  document.getElementById(id).addEventListener("change",()=>{
+    document.getElementById("coll-lbl").classList.toggle("checked",document.getElementById("mc").checked);
+    document.getElementById("wish-lbl").classList.toggle("checked",document.getElementById("mw").checked);
+  });
+});
+document.getElementById("mcl").addEventListener("click",closeModal);
+document.getElementById("msv").addEventListener("click",()=>{
+  if(curM!=null){
+    const s=gs(curM);
+    s.coll=document.getElementById("mc").checked;
+    s.wish=document.getElementById("mw").checked;
+    s.note=document.getElementById("mn").value;
+    s.rating=curR;
+    S[curM]=s;scheduleSave();render();toast("💾 保存しました");
+  }
+  closeModal();
+});
+document.getElementById("ov").addEventListener("click",e=>{if(e.target===document.getElementById("ov"))closeModal()});
+
+// ── FILTERS ──
+document.querySelectorAll("[data-f]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    curF=b.dataset.f;
+    document.querySelectorAll("[data-f]").forEach(x=>x.classList.toggle("on",x.dataset.f===curF));
+    render();
+  });
+});
+document.querySelectorAll("[data-v]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    curV=b.dataset.v;
+    document.querySelectorAll("[data-v]").forEach(x=>x.classList.toggle("on",x.dataset.v===curV));
+    gc.classList.toggle("hidden",curV!=="grid");
+    lc.classList.toggle("vis",curV==="list");
+  });
+});
+document.getElementById("si").addEventListener("input",render);
+document.getElementById("bf").addEventListener("change",render);
+
+// brand filter populate
+const brands=[...new Set(MODELS.map(m=>m[2]))].sort((a,b)=>a.localeCompare(b,"ja"));
+brands.forEach(b=>{const o=document.createElement("option");o.value=b;o.textContent=b;document.getElementById("bf").appendChild(o)});
+
+document.getElementById('lang-btn').addEventListener('click', ()=> setLang(LANG==='ja'?'en':'ja'));
+setLang(LANG);
+
+// ── THEME ──
+(function(){
+  const t=document.querySelector("[data-theme-toggle]"),r=document.documentElement;
+  let d=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";
+  r.setAttribute("data-theme",d);
+  if(t)t.addEventListener("click",()=>{
+    d=d==="dark"?"light":"dark";r.setAttribute("data-theme",d);
+    t.innerHTML=d==="dark"
+      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  });
+})();
+
+// ── LOGOUT ──
+document.getElementById("logout-btn").addEventListener("click",async()=>{
+  await signOut(auth);toast("ログアウトしました");
+});
+
+// ── AUTH UI ──
+
+const I18N = {
+  ja: {
+    title:"TOMICA TRACKER", subtitle:"コレクション管理", loading:"接続中...",
+    loginTab:"ログイン", regTab:"新規登録", email:"メールアドレス", pass:"パスワード", login:"ログイン",
+    name:"表示名", pass2:"パスワード（6文字以上）", create:"アカウント作成", forgot:"パスワードをお忘れですか？",
+    total:"総数", owned:"所持", wish:"ほしい", miss:"未所持", all:"すべて", ownedF:"✓ 所持", wishF:"♥ ほしい", missF:"未所持",
+    brandAll:"全ブランド", search:"検索結果が見つかりません", memo:"メモ", rating:"評価", cancel:"キャンセル", save:"保存",
+    verifyTitle:"メール認証が必要です", verifySub:"メール認証が必要です", verifyMsg:"登録したメールアドレスに確認メールを送信しました。メール内のリンクをクリックして認証を完了してください。",
+    verifySent:"確認メールを送信しました。", verifyState:"認証状態を確認", verifyResend:"確認メールを再送信", logout:"ログアウト", language:"JP",
+    authOK:"✓ アカウントを作成しました。確認メールを送信しました。", loginHint:"先にメールアドレスを入力してください", resetOK:"パスワード再設定メールを送信しました", resetBtn:"パスワードをお忘れですか？"
+  },
+  en: {
+    title:"TOMICA TRACKER", subtitle:"Collection Tracker", loading:"Connecting...",
+    loginTab:"Sign in", regTab:"Register", email:"Email", pass:"Password", login:"Sign in",
+    name:"Display name", pass2:"Password (6+ chars)", create:"Create account", forgot:"Forgot password?",
+    total:"Total", owned:"Owned", wish:"Wishlist", miss:"Missing", all:"All", ownedF:"✓ Owned", wishF:"♥ Wishlist", missF:"Missing",
+    brandAll:"All brands", search:"No results found", memo:"Memo", rating:"Rating", cancel:"Cancel", save:"Save",
+    verifyTitle:"Email verification required", verifySub:"Verification needed", verifyMsg:"We sent a verification email to your address. Click the link in the email to complete verification.",
+    verifySent:"Verification email sent.", verifyState:"Check verification status", verifyResend:"Resend verification email", logout:"Logout", language:"EN",
+    authOK:"✓ Account created. Verification email sent.", loginHint:"Please enter your email first", resetOK:"Password reset email sent", resetBtn:"Forgot password?"
+  }
+};
+let LANG = localStorage.getItem('tomica_lang') || 'ja';
+function t(k){ return I18N[LANG][k] || I18N.ja[k] || k; }
+function setLang(lang){ LANG=lang; localStorage.setItem('tomica_lang', lang); document.documentElement.lang = lang==='ja' ? 'ja' : 'en'; document.getElementById('lang-btn').textContent = I18N[lang].language; renderStaticTexts(); render(); }
+function renderStaticTexts(){
+  document.querySelector('.auth-title').textContent = t('title');
+  document.querySelector('.auth-sub').textContent = t('subtitle');
+  document.getElementById('auth-loading').innerHTML = '<div class="spinner"></div>'+t('loading');
+  const tabs = document.querySelectorAll('.atab'); tabs[0].textContent = t('loginTab'); tabs[1].textContent = t('regTab');
+  document.querySelector('label[for="l-email"]').textContent = t('email');
+  document.querySelector('label[for="l-pass"]').textContent = t('pass');
+  document.getElementById('login-btn').textContent = t('login');
+  document.querySelector('label[for="r-name"]').textContent = t('name');
+  document.querySelector('label[for="r-email"]').textContent = t('email');
+  document.querySelector('label[for="r-pass"]').textContent = t('pass2');
+  document.getElementById('reg-btn').textContent = t('create');
+  document.getElementById('forgot-btn').textContent = t('forgot');
+  document.querySelector('.stat:nth-child(1) .stat-lbl').textContent = t('total');
+  document.querySelector('.stat:nth-child(2) .stat-lbl').textContent = t('owned');
+  document.querySelector('.stat:nth-child(3) .stat-lbl').textContent = t('wish');
+  document.querySelector('.stat:nth-child(4) .stat-lbl').textContent = t('miss');
+  document.querySelectorAll('.fb')[0].textContent = t('all');
+  document.querySelectorAll('.fb')[1].textContent = t('ownedF');
+  document.querySelectorAll('.fb')[2].textContent = t('wishF');
+  document.querySelectorAll('.fb')[3].textContent = t('missF');
+  document.getElementById('bf').options[0].textContent = t('brandAll');
+  document.getElementById('es').querySelector('p').textContent = t('search');
+  document.getElementById('mcl').textContent = t('cancel');
+  document.getElementById('msv').textContent = t('save');
+  document.querySelector('#verify-screen .auth-title').textContent = t('verifyTitle');
+  document.querySelector('#verify-screen .auth-sub').textContent = t('verifySub');
+  document.querySelector('#verify-screen p').textContent = t('verifyMsg');
+  document.getElementById('verify-ok').textContent = t('verifySent');
+  document.getElementById('check-verify-btn').textContent = t('verifyState');
+  document.getElementById('resend-verify-btn').textContent = t('verifyResend');
+  document.getElementById('verify-logout-btn').textContent = t('logout');
+}
+
+const authScreen=document.getElementById("auth-screen");
+const verifyScreen=document.getElementById("verify-screen");
+const authLoading=document.getElementById("auth-loading");
+const authTabs=document.getElementById("auth-tabs");
+const authBody=document.getElementById("auth-body");
+const appEl=document.getElementById("app");
+
+function showAuth(){
+  verifyScreen.style.display="none";
+  authScreen.style.display="flex";appEl.classList.remove("visible");
+  authLoading.style.display="none";authTabs.style.display="flex";authBody.style.display="block";
+}
+function showVerify(){
+  authScreen.style.display="none";
+  appEl.classList.remove("visible");
+  verifyScreen.style.display="flex";
+}
+function showApp(user){
+  verifyScreen.style.display="none";
+  authScreen.style.display="none";appEl.classList.add("visible");
+  document.getElementById("user-label").textContent=user.displayName||user.email; document.getElementById("logout-btn").title=t("logout");
+}
+
+// Auth tabs
+document.querySelectorAll(".atab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    const tab=t.dataset.tab;
+    document.querySelectorAll(".atab").forEach(x=>x.classList.toggle("on",x.dataset.tab===tab));
+    document.getElementById("login-form").classList.toggle("hidden",tab!=="login");
+    document.getElementById("reg-form").classList.toggle("hidden",tab!=="register");
+    document.getElementById("login-err").classList.remove("show");
+    document.getElementById("reg-err").classList.remove("show");
+    document.getElementById("reg-ok").classList.remove("show");
+  });
+});
+
+// Login
+document.getElementById("login-form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const btn=document.getElementById("login-btn"),errEl=document.getElementById("login-err");
+  btn.disabled=true;btn.textContent="ログイン中...";errEl.classList.remove("show");
+  try{
+    await signInWithEmailAndPassword(auth,document.getElementById("l-email").value,document.getElementById("l-pass").value);
+  }catch(err){
+    const msgs={"auth/invalid-credential":"メールまたはパスワードが正しくありません","auth/user-not-found":"アカウントが見つかりません","auth/wrong-password":"パスワードが正しくありません","auth/too-many-requests":"試行回数が多すぎます。しばらくしてからお試しください"};
+    errEl.textContent=msgs[err.code]||"エラーが発生しました: "+err.message;
+    errEl.classList.add("show");
+    btn.disabled=false;btn.textContent="ログイン";
+  }
+});
+
+// Register
+document.getElementById("reg-form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const btn=document.getElementById("reg-btn"),errEl=document.getElementById("reg-err"),okEl=document.getElementById("reg-ok");
+  btn.disabled=true;btn.textContent="作成中...";errEl.classList.remove("show");okEl.classList.remove("show");
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,document.getElementById("r-email").value,document.getElementById("r-pass").value);
+    await updateProfile(cred.user,{displayName:document.getElementById("r-name").value});
+    await sendEmailVerification(cred.user);
+    okEl.textContent=t("authOK");okEl.classList.add("show");
+  }catch(err){
+    const msgs={"auth/email-already-in-use":"このメールアドレスはすでに使用されています","auth/weak-password":"パスワードは6文字以上にしてください","auth/invalid-email":"メールアドレスの形式が正しくありません"};
+    errEl.textContent=msgs[err.code]||"エラーが発生しました: "+err.message;
+    errEl.classList.add("show");
+    btn.disabled=false;btn.textContent="アカウント作成";
+  }
+});
+
+// forgot password
+document.getElementById("forgot-btn").addEventListener("click", async()=>{
+  const email=(document.getElementById("l-email").value||"").trim();
+  const errEl=document.getElementById("login-err");
+  errEl.classList.remove("show");
+  if(!email){errEl.textContent="先にメールアドレスを入力してください";errEl.classList.add("show");return;}
+  try{
+    await sendPasswordResetEmail(auth,email);
+    toast(t("resetOK"));
+  }catch(err){
+    const msgs={"auth/invalid-email":"メールアドレスの形式が正しくありません","auth/user-not-found":"アカウントが見つかりません"};
+    errEl.textContent=msgs[err.code]||"再設定メールの送信に失敗しました";
+    errEl.classList.add("show");
+  }
+});
+
+document.getElementById("resend-verify-btn").addEventListener("click", async()=>{
+  const ok=document.getElementById("verify-ok"), err=document.getElementById("verify-err");
+  ok.classList.remove("show"); err.classList.remove("show");
+  try{
+    if(auth.currentUser){
+      await sendEmailVerification(auth.currentUser);
+      ok.textContent="確認メールを再送信しました。";
+      ok.classList.add("show");
+    }
+  }catch(e){
+    err.textContent="確認メールの再送信に失敗しました。少し待って再試行してください。";
+    err.classList.add("show");
+  }
+});
+
+document.getElementById("check-verify-btn").addEventListener("click", async()=>{
+  const ok=document.getElementById("verify-ok"), err=document.getElementById("verify-err");
+  ok.classList.remove("show"); err.classList.remove("show");
+  try{
+    if(auth.currentUser){
+      await reload(auth.currentUser);
+      if(auth.currentUser.emailVerified){
+        currentUser=auth.currentUser;
+        authLoading.style.display="block";authTabs.style.display="none";authBody.style.display="none";
+        await loadCloud();
+        render();
+        showApp(auth.currentUser);
+        toast("メール認証が完了しました");
+      } else {
+        err.textContent=LANG==="ja"?"まだメール認証が完了していません。受信箱のリンクを確認してください。":"Verification is not complete yet. Please check the link in your inbox.";
+        err.classList.add("show");
+      }
+    }
+  }catch(e){
+    err.textContent="認証状態の確認に失敗しました。";
+    err.classList.add("show");
+  }
+});
+
+document.getElementById("verify-logout-btn").addEventListener("click", async()=>{ await signOut(auth); });
+
+// ── AUTH STATE LISTENER ──
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    currentUser=user;
+    authLoading.style.display="block";authTabs.style.display="none";authBody.style.display="none";
+    await reload(user);
+    if(!user.emailVerified){
+      showVerify();
+      return;
+    }
+    await loadCloud();
+    render();
+    showApp(user);
+  } else {
+    currentUser=null;S={};
+    showAuth();
+  }
+});
+</script>
+</body>
+</html>
